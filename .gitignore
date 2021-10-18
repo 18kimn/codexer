@@ -1,0 +1,6 @@
+node_modules/
+
+# clutter from debugging/ dev processes
+*pdf
+test.html
+test.md
