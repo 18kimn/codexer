@@ -21,7 +21,7 @@ const main = async (target, options) => {
     stylePath: headerPath,
     dryHTML: html,
     quietly,
-  } = options
+  } = options || {}
 
   if (!target) return
   const baseHeader = await fs.readFile(
