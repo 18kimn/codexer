@@ -28,8 +28,12 @@ program
     Most useful after trying out the -d option to see what a config should look like.`,
   )
   .option(
-    '-h --headerPath <path>',
+    '-s --stylePath <path>',
     'Path to a HTML file with configurations that will be used to style the PDF.',
+  )
+  .option(
+    '-dh --dryHTML',
+    'Like the dry run option, but produces just HTML output. No page numbers though :(',
   )
   .option('-q --quietly', 'Suppress all debugging messages')
 

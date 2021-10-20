@@ -3,20 +3,41 @@ import highlight from './highlighter.js'
 import makeTOC from './makeTOC.js'
 import {promises as fs} from 'fs'
 import {join, resolve, basename, dirname} from 'path'
-import {tmpdir} from 'os'
+import {platform, tmpdir} from 'os'
 import makeTitlePage from './makeTitlePage.js'
 import makeEntries from './makeEntries.js'
 import {merge} from 'merge-pdf-buffers'
 import {fileURLToPath} from 'url'
 import {updateConsole} from './utils.js'
+import marked from 'marked'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const main = async (target, options) => {
-  const {author, outPath, dry, json, headerPath, quietly} = options
+  const {
+    author,
+    outPath,
+    dry,
+    json,
+    stylePath: headerPath,
+    dryHTML: html,
+    quietly,
+  } = options
 
-  const header = await fs.readFile(
+  if (!target) return
+  const baseHeader = await fs.readFile(
     headerPath || join(__dirname, './header.html'),
   )
+
+  // on linux, the default dpi messes phantomjs up.
+  // See https://github.com/marcbachmann/node-html-pdf/issues/525
+  const zoom = `
+<style>
+html {
+  zoom: ${platform() === 'linux' ? 0.753 : 1};
+}
+</style>
+`
+  const header = zoom + baseHeader
 
   // we want to safely save to a temp directory
   //  if a specific path is not given
@@ -54,14 +75,25 @@ const main = async (target, options) => {
     }),
   )
 
+  if (html) {
+    const htmlPath = join(outDir, `${basename(resolve(target))}.html`)
+    await fs.writeFile(
+      htmlPath,
+      header +
+        marked(entries.join('<div style="page-break-after: always;"></div>')),
+    )
+    updateConsole(quietly, `HTML file written to ${htmlPath}\n`)
+    return
+  }
+
   updateConsole(quietly, 'creating title page and table of contents buffers...')
   const titleBuffer = makeTitlePage(target, author || '')
   const entryBuffers = await makeEntries(entries, header, quietly)
   const tocBuffer = makeTOC(fileObj, header, entryBuffers)
 
   updateConsole(quietly, 'writing file to disk...')
-  // // assembling buffers and writing
-  Promise.all([titleBuffer, tocBuffer, ...entryBuffers])
+  // assembling buffers and writing
+  return Promise.all([titleBuffer, tocBuffer, ...entryBuffers])
     .then((buffers) => merge(buffers))
     .then((merged) => fs.writeFile(resolvedOutPath, merged))
     .then(() =>
