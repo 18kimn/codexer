@@ -1,1 +1,3 @@
-# repobook: Make a book out of a repository
+# codexer
+
+### make a book out of a (code) directory

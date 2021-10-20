@@ -1,22 +1,25 @@
 {
-  "name": "repobook",
+  "name": "codexer",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "type": "module",
-  "directories": {
-    "example": "example"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "bin": {
+    "codexer": "src/cli.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Nathan Kim",
   "license": "ISC",
   "dependencies": {
+    "commander": "^8.2.0",
     "highlight.js": "^11.3.0",
     "html-pdf": "^3.0.1",
+    "istextorbinary": "^6.0.0",
     "json2md": "^1.12.0",
+    "marked": "^3.0.7",
+    "merge-pdf-buffers": "^1.0.3",
+    "pdf-lib": "^1.17.0",
+    "pdf-parse": "^1.1.1",
     "prettier": "^2.4.1"
   }
 }

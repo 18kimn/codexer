@@ -1,34 +1,47 @@
 import fs from 'fs'
 import path from 'path'
+import {isBinary} from 'istextorbinary'
+
+/*
+  getAllFiles(dirPath, exclusions, container)
+    - dirPath: path of directory to make into a book
+    - exclusions: regular expressions to exclude directories and files. 
+    - container: Used in file recursion, do not touch yourself
+  Returns an array, with strings for filenames and objects for directories. 
+    Directory objects are just one item long, with that one item being named the directory name.
+*/
 
 const getAllFiles = (
   dirPath,
-  container = [],
-  excludes = [
+  exclusions = [
     /node_modules/,
     /\.git/,
-    /\.pdf/,
     /\.lock/,
     /neo4j_data/,
     /package-lock/,
-    /\.png/,
-    /\.svg/,
     /\.env/,
   ],
+  container = [],
 ) => {
-  if (excludes.some((exclude) => exclude.test(dirPath))) return
+  if (exclusions.some((exclude) => exclude.test(dirPath))) return
 
   const files = fs.readdirSync(dirPath)
   files.forEach((file) => {
-    if (excludes.some((exclude) => exclude.test(file))) return
+    const inExclusions = exclusions.some((exclude) => exclude.test(file))
+    const notText = isBinary(file)
+    if (inExclusions || notText) return
     fs.statSync(dirPath + '/' + file).isDirectory()
       ? container.push({
-          [file]: getAllFiles(path.join(dirPath, '/', file), [], excludes),
+          [file]: getAllFiles(path.join(dirPath, '/', file), exclusions, []),
         })
       : container.push(file)
   })
   return container
 }
+
+/*
+  Converts the nested array returned by getAllFiles into a flat array.
+*/
 
 const fileObjToArray = (nested, currentPath = '') => {
   const prefix = currentPath ? currentPath + '/' : currentPath
