@@ -28,14 +28,20 @@ program
     Most useful after trying out the -d option to see what a config should look like.`,
   )
   .option(
-    '-s --stylePath <path>',
-    'Path to a HTML file with configurations that will be used to style the PDF.',
-  )
-  .option(
     '-dh --dryHTML',
     'Like the dry run option, but produces just HTML output. No page numbers though :(',
   )
+  .option(
+    '-s --stylePath <path>',
+    'Path to a HTML file with configurations that will be used to style the PDF.',
+  )
   .option('-q --quietly', 'Suppress all debugging messages')
+  .option(
+    '-e --exclude <patterns...>',
+    `Specify regex patterns for files to exclude. Default excludes node_modules,
+.git, yarn.lock and package-lock.json, and .env files.
+Codexer also excludes any non-text encoded files; this cannot be altered.`,
+  )
 
 program.parse()
 

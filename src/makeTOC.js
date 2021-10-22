@@ -11,6 +11,10 @@ import {fileObjToArray} from './fileProcessing.js'
 import {baseOpts, getPageCount} from './utils.js'
 import prettier from 'prettier'
 import pdf from 'html-pdf'
+import {promises as fs} from 'fs'
+import {fileURLToPath} from 'url'
+import {join} from 'path'
+import {dirname} from 'path'
 
 const makeRow = (filename, pageNum, indent, index) => {
   const spaces = Array(indent).fill('&nbsp;').join('')
@@ -30,9 +34,9 @@ const makeTOCArray = async (
   return fileObj.reduce(async (prev, curr, index) => {
     prev = await prev
     const filename = typeof curr === 'string' ? curr : Object.keys(curr)[0]
-
+    if (!Object.values(curr)[0].length) return prev
     const fileIndex = fileArray.findIndex((node) => node === parent + filename)
-    const pageNum = await pageCounts[fileIndex]
+    const pageNum = fileIndex === 0 ? 1 : (await pageCounts[fileIndex - 1]) + 1
     const row = makeRow(filename, pageNum || '', indent, index)
     const toAdd =
       typeof curr === 'string'
@@ -52,6 +56,16 @@ const makeTOCArray = async (
 }
 
 const makeTOC = async (fileObj, header, entryBuffers) => {
+  const footer = {
+    height: '20mm',
+    contents: {
+      default: await fs.readFile(
+        join(dirname(fileURLToPath(import.meta.url)), 'tocFooter.html'),
+        'utf-8',
+      ),
+    },
+  }
+
   const pageCountPromises = Promise.all(entryBuffers.map(getPageCount))
   const pageCounts = (await pageCountPromises)
     .reduce((prev, curr) => [...prev, curr + prev[prev.length - 1]], [0])
@@ -83,7 +97,7 @@ span, tr{font-size: 10pt;}
 ${prettiered}`)
 
   return new Promise((resolve) => {
-    pdf.create(html, baseOpts).toBuffer((_, buffer) => {
+    pdf.create(html, {...baseOpts, footer}).toBuffer((_, buffer) => {
       resolve(buffer)
     })
   })

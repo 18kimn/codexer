@@ -12,7 +12,6 @@ const prettierSupported = prettier
 
 const highlight = async (filename, dirname, opts) => {
   const {quietly, index, totalLength} = opts
-  updateConsole(quietly, `Highlighting entries... ${index + 1}/${totalLength}`)
 
   const basefilename = filename
   filename = join(dirname, filename)
@@ -30,6 +29,7 @@ const highlight = async (filename, dirname, opts) => {
       ? hljs.highlight(prettified, {language: ext}).value
       : hljs.highlightAuto(prettified).value
   const linkTag = makeLink(basefilename)
+  updateConsole(quietly, `Highlighting entries... ${index + 1}/${totalLength}`)
 
   return `
   

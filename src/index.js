@@ -21,6 +21,7 @@ const main = async (target, options) => {
     stylePath: headerPath,
     dryHTML: html,
     quietly,
+    exclude,
   } = options || {}
 
   if (!target) return
@@ -48,13 +49,13 @@ html {
   const resolvedOutPath =
     outPath || join(outDir, `${basename(resolve(target))}.pdf`)
 
-  // we want to enable a dry run,
-  //  and use the file at the path sepcified at json
-  //  if json is a string
+  // handle user-specified exclusions
+  const defaultExclusions = [/node_modules/, /\.git/, /lock/, /\.env/]
+  const exclusions = exclude.map((str) => new RegExp(str)) || defaultExclusions
 
   let fileObj
   if (dry) {
-    const json = getAllFiles(resolve(target))
+    const json = getAllFiles(resolve(target), exclusions)
     const jsonPath = join(outDir, `${basename(resolve(target))}.json`)
     await fs.writeFile(jsonPath, JSON.stringify(json))
     console.log(`dry run finished; json written to ${jsonPath}`)
@@ -62,7 +63,7 @@ html {
   } else if (typeof json === 'string') {
     fileObj = JSON.parse(await fs.readFile(resolve(json), {encoding: 'utf-8'}))
   } else {
-    fileObj = getAllFiles(resolve(target))
+    fileObj = getAllFiles(resolve(target), exclusions)
   }
 
   const fileArray = fileObjToArray(fileObj)

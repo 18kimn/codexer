@@ -16,9 +16,8 @@ const makeLink = (filename) => {
   return filename.toLowerCase().replace(/\/|\./g, '-')
 }
 
-const getPageCount = (buffer) => {
-  return pdfparse(buffer).then((data) => data.numpages)
-}
+const getPageCount = async (buffer) =>
+  pdfparse(buffer).then((data) => data.numpages)
 
 const baseOpts = {
   timeout: '120000',

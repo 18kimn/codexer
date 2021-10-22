@@ -11,24 +11,15 @@ import {isBinary} from 'istextorbinary'
     Directory objects are just one item long, with that one item being named the directory name.
 */
 
-const getAllFiles = (
-  dirPath,
-  exclusions = [
-    /node_modules/,
-    /\.git/,
-    /\.lock/,
-    /neo4j_data/,
-    /package-lock/,
-    /\.env/,
-  ],
-  container = [],
-) => {
+const getAllFiles = (dirPath, exclusions, container = []) => {
   if (exclusions.some((exclude) => exclude.test(dirPath))) return
 
   const files = fs.readdirSync(dirPath)
   files.forEach((file) => {
-    const inExclusions = exclusions.some((exclude) => exclude.test(file))
-    const notText = isBinary(file)
+    const inExclusions = exclusions.some((exclude) =>
+      exclude.test(file.toLowerCase()),
+    )
+    const notText = isBinary(file.toLowerCase())
     if (inExclusions || notText) return
     fs.statSync(dirPath + '/' + file).isDirectory()
       ? container.push({
