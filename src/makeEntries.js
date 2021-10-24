@@ -6,7 +6,7 @@ import {baseOpts, getPageCount, updateConsole} from './utils.js'
 // this unfortunately cannot be done async since we need to know the length of each document
 
 const getBuffer = async (entry, pageStartOffset = 0, opts) => {
-  const {header, index, totalLength, quietly} = opts
+  const {header, index, totalLength, quietly, dims} = opts
   const footer = {
     height: '20mm',
     contents: {
@@ -21,20 +21,22 @@ const getBuffer = async (entry, pageStartOffset = 0, opts) => {
 
   const html = marked(header + entry)
   return new Promise((resolve) => {
-    pdf.create(html, {...baseOpts, footer}).toBuffer(async (_, buffer) => {
-      updateConsole(
-        quietly,
-        `creating buffers for entries...${index}/${totalLength}`,
-      )
-      resolve(buffer)
-    })
+    pdf
+      .create(html, {...baseOpts, footer, ...dims})
+      .toBuffer(async (_, buffer) => {
+        updateConsole(
+          quietly,
+          `creating buffers for entries...${index + 1}/${totalLength}`,
+        )
+        resolve(buffer)
+      })
   })
 }
 
-const makeEntries = async (entries, header, quietly) => {
+const makeEntries = async (entries, header, quietly, dims) => {
   let pageOffset = 0
   const buffers = entries.reduce(async (prev, curr, index) => {
-    const opts = {header, index, totalLength: entries.length - 1, quietly}
+    const opts = {header, index, totalLength: entries.length, quietly, dims}
     const prevArray = await prev
     const lastBuffer = await prevArray[prevArray.length - 1]
     pageOffset = lastBuffer

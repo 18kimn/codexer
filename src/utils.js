@@ -1,5 +1,4 @@
 import json from 'highlight.js/lib/languages/json'
-import markdown from 'highlight.js/lib/languages/markdown'
 import html from 'highlight.js/lib/languages/xml'
 import yaml from 'highlight.js/lib/languages/yaml'
 import pdfparse from 'pdf-parse'
@@ -7,7 +6,6 @@ import pdfparse from 'pdf-parse'
 
 const langs = {
   json,
-  markdown,
   html,
   yaml,
 }
@@ -21,8 +19,6 @@ const getPageCount = async (buffer) =>
 
 const baseOpts = {
   timeout: '120000',
-  width: '152mm',
-  height: '228mm',
   border: {
     top: '0.5in',
     right: '0.5in',

@@ -24,6 +24,8 @@ const main = async (target, options) => {
     exclude,
   } = options || {}
 
+  const {width, height} = options || {}
+  const dims = {width: width || '152mm', height: height || '228mm'}
   if (!target) return
   const baseHeader = await fs.readFile(
     headerPath || join(__dirname, './header.html'),
@@ -51,7 +53,7 @@ html {
 
   // handle user-specified exclusions
   const defaultExclusions = [/node_modules/, /\.git/, /lock/, /\.env/]
-  const exclusions = exclude.map((str) => new RegExp(str)) || defaultExclusions
+  const exclusions = exclude?.map((str) => new RegExp(str)) || defaultExclusions
 
   let fileObj
   if (dry) {
@@ -88,9 +90,9 @@ html {
   }
 
   updateConsole(quietly, 'creating title page and table of contents buffers...')
-  const titleBuffer = makeTitlePage(target, author || '')
-  const entryBuffers = await makeEntries(entries, header, quietly)
-  const tocBuffer = makeTOC(fileObj, header, entryBuffers)
+  const titleBuffer = makeTitlePage(target, author || '', dims)
+  const entryBuffers = await makeEntries(entries, header, quietly, dims)
+  const tocBuffer = makeTOC(fileObj, header, entryBuffers, dims)
 
   updateConsole(quietly, 'writing file to disk...')
   // assembling buffers and writing

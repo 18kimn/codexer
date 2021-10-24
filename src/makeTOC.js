@@ -55,7 +55,7 @@ const makeTOCArray = async (
   }, new Promise((resolve) => resolve([])))
 }
 
-const makeTOC = async (fileObj, header, entryBuffers) => {
+const makeTOC = async (fileObj, header, entryBuffers, dims) => {
   const footer = {
     height: '20mm',
     contents: {
@@ -97,7 +97,7 @@ span, tr{font-size: 10pt;}
 ${prettiered}`)
 
   return new Promise((resolve) => {
-    pdf.create(html, {...baseOpts, footer}).toBuffer((_, buffer) => {
+    pdf.create(html, {...baseOpts, footer, ...dims}).toBuffer((_, buffer) => {
       resolve(buffer)
     })
   })

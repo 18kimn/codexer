@@ -36,6 +36,8 @@ program
     'Path to a HTML file with configurations that will be used to style the PDF.',
   )
   .option('-q --quietly', 'Suppress all debugging messages')
+  .option('-w --width <length>', 'Page width')
+  .option('-h --height <length>', 'Page height')
   .option(
     '-e --exclude <patterns...>',
     `Specify regex patterns for files to exclude. Default excludes node_modules,
