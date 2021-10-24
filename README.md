@@ -19,6 +19,9 @@ The actual PDF generation is done with
 [html-pdf](https://github.com/marcbachmann/node-html-pdf/issues) with some
 processing done in [pdf-parse](https://www.npmjs.com/package/pdf-parse).
 
+**View an example PDF of what this tool can make
+[here](https://nathankim.name/files/codexer.pdf).**
+
 ### Usage (CLI)
 
 Install with `npm install --global codexer`.
