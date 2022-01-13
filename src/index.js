@@ -23,7 +23,6 @@ const main = async (target, options) => {
     quietly,
     exclude,
   } = options || {}
-
   const {width, height} = options || {}
   const dims = {width: width || '152mm', height: height || '228mm'}
   if (!target) return
@@ -59,6 +58,7 @@ html {
   if (dry) {
     const json = getAllFiles(resolve(target), exclusions)
     const jsonPath = join(outDir, `${basename(resolve(target))}.json`)
+
     await fs.writeFile(jsonPath, JSON.stringify(json))
     console.log(`dry run finished; json written to ${jsonPath}`)
     return
